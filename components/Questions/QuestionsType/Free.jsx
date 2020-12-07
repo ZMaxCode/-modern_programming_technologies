@@ -26,9 +26,6 @@ const Free = () => {
 
     return (
         <>
-            <h2>
-                {text}
-            </h2>
             {
                 <InputTextarea value={ answer === undefined ? '' : answer.answers[0]} onChange={onChange} />
             }

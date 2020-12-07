@@ -1,85 +1,245 @@
 import host from '../../helpers/host';
 import port from '../../helpers/port';
-import Question from '../../components/Questions';
-import { MultiSelect } from 'primereact/multiselect';
-import { useState } from 'react';
+import SectionsSettings from '../../components/SectionsSettings';
+import TestsSettings from '../../components/TestsSettings';
+import Tests from '../../components/Tests';
+import Timer from '../../components/Timer';
+import Results from '../../components/Results';
+import { useState, useEffect } from 'react';
 import styles from './style.module.scss';
-import Context from '../../contexts/changeAnswerContext';
+import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
 
 function Course({ course }) {
-    const [sectionName, setSectionName] = useState([]);
+    const [isSectionSettings, setIsSectionSettings] = useState(true);
+    const [sections, setSections] = useState([[]])
+    const [selectSections, setSelectSections] = useState([[]]);
+    const [selectedSections, setSelectedSections] = useState([]);
+    const [questions, setQuestions] = useState([]);
+
+    const [isTestSettings, setIsTestSettings] = useState(false);
+    const [questionsCount, setQuestionsCount] = useState();
+    const [timerActive, setTimerActive] = useState(false);
+    const [duration, setDuration] = useState(10 * 60 * 1000);
+
+    const [isStartTest, setIsStartTest] = useState(false);
     const [answers, setAnswers] = useState([]);
-    let _sections = [];
 
-    function sections(structure) {
-        structure.forEach(el => {
-            if ('nested_course_sections' in el && el.nested_course_sections.length !== 0) {
-                _sections.push(el.nested_course_sections);
-                sections(el.nested_course_sections);
-            }
-        })
-    }
+    const [isFinishTest, setIsFinishTest] = useState(false);
+    const [scores, setScores] = useState(0);
+    let toast;
 
-    sections(course.structure)
+    useEffect(() => {
+        function sections_(structure, idx) {
+            let copy = [...sections];
+            structure.map(el => copy[idx].push(el));
+            setSections(copy);
+
+            structure.forEach(el => {
+                if ('nested_course_sections' in el && el.nested_course_sections.length !== 0) {
+                    sections.push([]);
+                    selectSections.push([]);
+                    sections_(el.nested_course_sections, idx + 1);
+                }
+            })
+        }
+
+        sections_(course.structure, 0);
+    }, [])
 
     function handle(i, event) {
-        let copy = [...sectionName];
+        let copy = [...selectSections];
+
         copy[i] = event.value;
-        setSectionName(copy);
+
+        if (event.value.length === 0) {
+            for (let j = i; j < copy.length; j++) {
+                copy[j] = [];
+            }
+        }
+
+        setSelectSections(copy);
     }
 
-    console.log(answers)
+    function onSectionsChange(e) {
+        let copy = [...selectedSections];
+        let copy2 = [...questions];
+
+        if (e.checked) {
+            copy.push(e.value);
+            e.value.questions.map(el => copy2.push(el));
+        } else {
+            copy = copy.filter(el => el !== e.value);
+            copy2 = copy2.filter(el => e.value.id !== el.owner_section_id);
+        }
+
+        setSelectedSections(copy);
+        setQuestions(copy2);
+    }
+
+    function testSettings() {
+        setIsSectionSettings(false);
+        setIsTestSettings(true);
+    }
+
+    function SectionSettings() {
+        setIsTestSettings(false);
+        setIsSectionSettings(true);
+    }
+
+    function onChangeQuestionsCount(e) {
+        if (e.value > questions.length) {
+            toast.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'The value cannot be more than the number of questions',
+                life: 30000
+            })
+            return
+        }
+
+        setQuestionsCount(e.value)
+    }
+
+    function startTest() {
+        let error = false;
+
+        if (selectSections.length === 0) {
+            toast.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'You have not selected sections',
+                life: 30000
+            })
+
+            error = true;
+        }
+
+        if (error) return;
+
+        if (selectedSections.length === 0) {
+            toast.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'You have not selected the sections from which to take questions',
+                life: 30000
+            })
+
+            error = true;
+        }
+
+        if (error) return;
+
+        if (questions.length === 0) {
+            toast.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Selected sections have no questions',
+                life: 30000
+            })
+
+            error = true;
+        }
+
+        if (error) return;
+
+        if (questionsCount === undefined) setQuestionsCount(questions.length);
+
+        if (questionsCount < questions.length) {
+            let quests = [];
+
+            for (let i = 0; i < questionsCount; i++) {
+                quests.push(questions.splice(Math.floor(Math.random() * questions.length - 1), 1)[0]);
+            }
+
+            setQuestions(quests);
+        }
+
+        setIsTestSettings(false);
+        setIsStartTest(true);
+        setTimerActive(true);
+    }
+
+    function finishTest() {
+        let copy = scores;
+
+        answers.map(answer => {
+            questions.find(questions => questions.id === answer.question_id)?.possible_answers?.map(el => {
+                if (answer.answers.find(ans => el.id === ans) && el.is_right)
+                    copy += el.points
+            })
+        })
+
+        setScores(copy);
+
+        setTimerActive(false);
+        setIsStartTest(false);
+        setIsFinishTest(true);
+    }
+
+    if (isStartTest && !timerActive) {
+        finishTest();
+    }
 
     return (
         <div className={styles.card}>
-            <div className="p-field p-md-4 p-pl-0">
-                <span className="p-float-label">
-                    <MultiSelect id="0" value={sectionName[0]} onChange={(e) => {
-                        handle(0, e);
-                    }} options={course.structure} optionLabel="section.name" className={styles.multi} filter />
-                    <label htmlFor="0">Course section</label>
-                </span>
-            </div>
             {
-                _sections.map((el, i) => {
-                    return (
-                        <div key={i} className="p-field p-md-4 p-pl-0">
-                            <span className="p-float-label">
-                                <MultiSelect id={`${i + 1}`} value={sectionName[i + 1]} onChange={(e) => {
-                                    handle(i + 1, e)
-                                }} options={el} optionLabel="section.name" className={styles.multi} filter />
-                                <label htmlFor={`${i + 1}`}>{`${el[0].level_name}`}</label>
-                            </span>
-                        </div>
-                    )
-                })
+                isSectionSettings &&
+                <>
+                    <SectionsSettings
+                        sections={sections}
+                        selectSections={selectSections}
+                        selectedSections={selectedSections}
+                        questions={questions}
+                        onSectionsChange={onSectionsChange}
+                        handle={handle}
+                    />
+                    <Button icon='pi pi-angle-right' label='Next step' className='p-mt-3 p-d-block' onClick={testSettings} />
+                </>
             }
             {
-                sectionName.map(el => {
-                    return el.map(el1 => {
-                        if ('questions' in el1) {
-                            return el1.questions.map((question, i) => {
-                                return (
-                                    <Context.Provider value={
-                                        {
-                                            answers,
-                                            setAnswers,
-                                            id : question.id,
-                                            text: question.text,
-                                            question_type: question.question_type,
-                                            possible_answers: question.possible_answers
-                                        }
-                                    }>
-                                        <Question
-                                            key={i}
-                                        ></Question>
-                                    </Context.Provider>
-                                )
-                            })
-                        }
-                    })
-                })
+                isTestSettings &&
+                <>
+                    <TestsSettings
+                        questions={questions}
+                        questionsCount={questionsCount}
+                        onChangeQuestionsCount={onChangeQuestionsCount}
+                        duration={duration}
+                        setDuration={setDuration}
+                    />
+                    <div className='p-mt-3'>
+                        <Button icon='pi pi-angle-left' label='Cancel' className='p-button-text p-button-secondary' onClick={SectionSettings} />
+                        <Button icon='pi pi-angle-right' label='Start test' className='p-mt-3 p-ml-6' onClick={startTest} />
+                    </div>
+                </>
             }
+            {
+                isStartTest &&
+                <>
+                    <Timer
+                        duration={duration}
+                        timerActive={timerActive}
+                        setTimerActive={setTimerActive}
+                    />
+                    <Tests
+                        questions={questions}
+                        answers={answers}
+                        setAnswers={setAnswers}
+                    ></Tests>
+                    <div className='p-mt-3'>
+                        <Button icon='pi pi-check' label='Finish test' className='p-mt-3' onClick={finishTest} />
+                    </div>
+                </>
+            }
+            {
+                isFinishTest &&
+                <>
+                    <Results
+                        scores={scores}
+                    />
+                </>
+            }
+            <Toast ref={(el) => toast = el} position='bottom-left' />
         </div>
     )
 }

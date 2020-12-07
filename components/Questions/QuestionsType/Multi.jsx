@@ -37,14 +37,11 @@ const Multi = () => {
 
     return (
         <>
-            <h2>
-                {text}
-            </h2>
             {
                 possible_answers.map((ans, i) => (
                     <div key={ans.id} className="p-field-checkbox">
                         <Checkbox
-                            inputId={i}
+                            inputId={`${i}`}
                             name="answer"
                             value={ans.id}
                             onChange={onAnswerChange}

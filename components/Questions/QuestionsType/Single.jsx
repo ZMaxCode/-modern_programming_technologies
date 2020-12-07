@@ -27,15 +27,12 @@ const Single = () => {
 
     return (
         <>
-            <h2>
-                {text}
-            </h2>
             {
                 possible_answers.map((ans, i) => {
                     return (
                         <div key={ans.id} className="p-field-radiobutton">
                             <RadioButton
-                                inputId={i}
+                                inputId={`${i}`}
                                 name="answer"
                                 value={ans.id}
                                 onChange={onChange}
