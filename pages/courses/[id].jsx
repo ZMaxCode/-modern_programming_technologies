@@ -16,11 +16,13 @@ function Course({ course }) {
     const [selectSections, setSelectSections] = useState([[]]);
     const [selectedSections, setSelectedSections] = useState([]);
     const [questions, setQuestions] = useState([]);
-
+    
     const [isTestSettings, setIsTestSettings] = useState(false);
     const [questionsCount, setQuestionsCount] = useState();
     const [timerActive, setTimerActive] = useState(false);
     const [duration, setDuration] = useState(10 * 60 * 1000);
+    const [complexity, setComplexity] = useState([]);
+    const [selectedComplexity, setSelectedComplexity] = useState([]);
 
     const [isStartTest, setIsStartTest] = useState(false);
     const [answers, setAnswers] = useState([]);
@@ -79,6 +81,17 @@ function Course({ course }) {
 
     function testSettings() {
         setIsSectionSettings(false);
+
+        let copy = [...complexity];
+
+        questions.map( el => {
+            if( !copy.find( c => c.value === el?.complexity ) ){
+                copy.push( {value : el.complexity} )
+            }
+        } )
+
+        setComplexity( copy );
+
         setIsTestSettings(true);
     }
 
@@ -99,6 +112,14 @@ function Course({ course }) {
         }
 
         setQuestionsCount(e.value)
+    }
+
+    function onChangeComplexity(e){
+        setSelectedComplexity(e.value);
+        
+        let count = e.value.length === 0 ? questions.length : questions.filter( el => e.value.indexOf( el.complexity ) > -1).length
+
+        setQuestionsCount( count );
     }
 
     function startTest() {
@@ -145,15 +166,19 @@ function Course({ course }) {
 
         if (questionsCount === undefined) setQuestionsCount(questions.length);
 
-        if (questionsCount < questions.length) {
-            let quests = [];
+        let quests = questions.filter( el => selectedComplexity.indexOf( el.complexity ) > -1);
+
+        if (questionsCount < quests.length) {
+            let q = [];
 
             for (let i = 0; i < questionsCount; i++) {
-                quests.push(questions.splice(Math.floor(Math.random() * questions.length - 1), 1)[0]);
+                q.push(quests.splice(Math.floor(Math.random() * quests.length - 1), 1)[0]);
             }
 
-            setQuestions(quests);
+            quests = q;
         }
+
+        setQuestions(quests);
 
         setIsTestSettings(false);
         setIsStartTest(true);
@@ -201,6 +226,9 @@ function Course({ course }) {
                 isTestSettings &&
                 <>
                     <TestsSettings
+                        complexity={complexity}
+                        selectedComplexity={selectedComplexity}
+                        onChangeComplexity={onChangeComplexity}
                         questions={questions}
                         questionsCount={questionsCount}
                         onChangeQuestionsCount={onChangeQuestionsCount}
