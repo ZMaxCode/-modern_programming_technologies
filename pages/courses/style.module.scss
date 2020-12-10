@@ -18,28 +18,17 @@
     width: 30vw;
 }
 
-.material-icons {
-    font-family: "Material Icons";
-    font-weight: normal;
-    font-style: normal;
-    font-size: 24px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    -webkit-font-feature-settings: "liga";
-    -webkit-font-smoothing: antialiased;
-}
-
 .header{
     display: flex;
     justify-content: flex-end;
     align-items: center;
     padding: 10px;
     height: 70px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
 }
 
 .aside{
@@ -48,6 +37,10 @@
     padding: 0 40px;
     height: calc(100vh - 70px);
     overflow: auto;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    z-index: 10;
 
     &__list{
         list-style: none;
@@ -73,14 +66,23 @@
 }
 
 .contentSide{
+    margin-top: 70px;
+    margin-left: 255px;
     display: flex;
     justify-content: center;
-    height: calc(100vh - 70px);
-    overflow: auto;
+    overflow: visible;
     width: 100%;
 }
 
 .container{
-    width: $container;
+    max-width: $container;
+    width: calc(100% - 100px);
     padding-bottom: 30px;
+}
+
+.timer{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }

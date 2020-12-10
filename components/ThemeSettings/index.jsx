@@ -8,7 +8,11 @@ const ThemeSettings = (props) => {
         {
             props.selectSections.map((sections, i) =>
                 (sections.length !== 0 && sections.some(el => el.questions)) && (
-                    <Panel header={sections[0]?.level_name} key={i}>
+                    <Panel 
+                        header={sections[0]?.level_name} 
+                        key={i}
+                        className='p-mb-4'
+                    >
                         {
                             sections.map((section, i) => {
                                 if ('questions' in section)

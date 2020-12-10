@@ -1,3 +1,13 @@
-.timer {
-    color: #007bff;
+@import '../../styles/params.scss';
+
+.multi {
+    width: $leftSideContainer;
+}
+
+.section{
+    background: $surface-c;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }

@@ -1,3 +1,7 @@
-.multi {
-    width: 30vw;
+@import '../../styles/params.scss';
+
+$inputWidth: 250px;
+
+.input{
+    width: $inputWidth;
 }

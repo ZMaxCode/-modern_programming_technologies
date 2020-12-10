@@ -68,7 +68,6 @@ function Course({ course }) {
     }
 
     function onSectionsChange(e) {
-        console.log(e)
         let copy = [...selectedSections];
         let copy2 = [...questions];
 
@@ -84,11 +83,15 @@ function Course({ course }) {
         setQuestions(copy2);
     }
 
+    useEffect(() => {
+        console.log(questions, complexity)
+    }, [questions, complexity])
+
     function testSettings() {
 
         let copy = [...complexity];
 
-        questions.map(el => {
+        questions.forEach(el => {
             if (!copy.find(c => c.value === el?.complexity)) {
                 copy.push({ value: el.complexity })
             }
@@ -96,11 +99,11 @@ function Course({ course }) {
 
         setComplexity(copy);
 
-        setActivePanel('themes')
+        setActivePanel('settings')
     }
 
     function SectionSettings() {
-        setActivePanel('sections')
+        setActivePanel('themes')
     }
 
     function onChangeQuestionsCount(e) {
@@ -210,6 +213,14 @@ function Course({ course }) {
     return (
         <>
             <header className={styles.header}>
+                <div className={styles.timer}>
+                    <Timer
+                        duration={duration}
+                        timerActive={timerActive}
+                        setTimerActive={setTimerActive}
+                    />
+                </div>
+
                 <div className='p-d-flex p-ai-center'>
                     <Button
                         icon='pi pi-cog'
@@ -234,8 +245,11 @@ function Course({ course }) {
                     </ul>
                 </aside>
                 <div className={styles.contentSide}>
-                    <div className={styles.container}>
-                        <h1 className='p-mt-0'>Программирование</h1>
+                    <div className={`${styles.container} p-pl-1`}>
+                        {
+                            activePanel !== 'testing' && 
+                            <h1 className='p-mt-0'>Программирование</h1>
+                        }
 
                         <View activePanel={activePanel}>
 
@@ -254,12 +268,11 @@ function Course({ course }) {
                                     </div>
 
                                     <div className='p-ml-4'>
-                                        Суммарное количество вопросов в выбранных секциях: {questions.length}
                                         <Button
                                             icon='pi pi-angle-right'
                                             label='Следующий шаг'
                                             className='p-d-block p-mt-2'
-                                            onClick={testSettings}
+                                            onClick={() => setActivePanel('themes')}
                                         />
                                     </div>
 
@@ -277,12 +290,12 @@ function Course({ course }) {
                                         />
                                     </div>
                                     <div className='p-ml-4'>
-
+                                        Суммарное количество вопросов<br /> в выбранных секциях: {questions.length}
                                         <Button
                                             icon='pi pi-angle-right'
                                             label='Следующий шаг'
                                             className='p-d-block p-mt-2'
-                                            onClick={() => setActivePanel('settings')}
+                                            onClick={testSettings}
                                         />
                                         <Button
                                             icon='pi pi-angle-left'
@@ -295,35 +308,50 @@ function Course({ course }) {
                             </div>
 
                             <div id='settings'>
-                                <TestsSettings
-                                    complexity={complexity}
-                                    selectedComplexity={selectedComplexity}
-                                    onChangeComplexity={onChangeComplexity}
-                                    questions={questions}
-                                    questionsCount={questionsCount}
-                                    onChangeQuestionsCount={onChangeQuestionsCount}
-                                    duration={duration}
-                                    setDuration={setDuration}
-                                />
-                                <div className='p-mt-3'>
-                                    <Button icon='pi pi-angle-left' label='Cancel' className='p-button-text p-button-secondary' onClick={SectionSettings} />
-                                    <Button icon='pi pi-angle-right' label='Start test' className='p-mt-3 p-ml-6' onClick={startTest} />
+                                <h2 className={styles.h2}>Шаг 3. Выберите количество вопросов и время</h2>
+                                <div className='p-d-flex p-ai-start'>
+                                    <div className={styles.leftSide}>
+                                        <span><b>В данном разделе вам необходимо указать параметры для прохождения одного теста</b></span>
+                                        <TestsSettings
+                                            complexity={complexity}
+                                            selectedComplexity={selectedComplexity}
+                                            onChangeComplexity={onChangeComplexity}
+                                            questions={questions}
+                                            questionsCount={questionsCount}
+                                            onChangeQuestionsCount={onChangeQuestionsCount}
+                                            duration={duration}
+                                            setDuration={setDuration}
+                                        />
+                                    </div>
+                                    <div>
+                                        <Button
+                                            icon='pi pi-angle-right'
+                                            label='Начать прохождение теста'
+                                            className='p-d-block'
+                                            onClick={startTest}
+                                        />
+                                        <Button
+                                            icon='pi pi-angle-left'
+                                            label='Назад'
+                                            className='p-button-secondary p-d-block p-mt-3'
+                                            onClick={SectionSettings}
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
                             <div id='testing'>
-                                <Timer
-                                    duration={duration}
-                                    timerActive={timerActive}
-                                    setTimerActive={setTimerActive}
-                                />
                                 <Tests
                                     questions={questions}
                                     answers={answers}
                                     setAnswers={setAnswers}
                                 ></Tests>
                                 <div className='p-mt-3'>
-                                    <Button icon='pi pi-check' label='Finish test' className='p-mt-3' onClick={finishTest} />
+                                    <Button 
+                                        icon='pi pi-check' 
+                                        label='Finish test' 
+                                        className='p-mt-3 p-mb-6' onClick={finishTest} 
+                                    />
                                 </div>
                             </div>
 

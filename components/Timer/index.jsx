@@ -11,16 +11,22 @@ const Timer = (props) => {
         setTime(time);
         setDuration(duration);
 
-        if( time > duration ) {
+        if (time > duration) {
             props.setTimerActive(false);
         }
     }
 
     return (
-        <h1 className={styles.timer}>
-            <TimerWrapper active={props.timerActive} duration={duration} onTimeUpdate={onTimerUpdate} />
-            <Timecode time={duration - time} />
-        </h1>
+        <>
+            {
+                props.timerActive && 
+                <h1 className={styles.timer}>
+                    <TimerWrapper active={props.timerActive} duration={duration} onTimeUpdate={onTimerUpdate} />
+                    <Timecode time={duration - time} />
+                </h1>
+            }
+
+        </>
     )
 }
 

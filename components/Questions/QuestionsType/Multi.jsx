@@ -1,6 +1,7 @@
 import { Checkbox } from 'primereact/checkbox';
 import { useContext } from 'react';
 import Context from '../../../contexts/changeAnswerContext';
+import styles from './style.module.scss';
 
 const Multi = () => {
     const {id, text, possible_answers, setAnswers, answers} = useContext(Context);
@@ -36,10 +37,10 @@ const Multi = () => {
     let answer = answers.find(el => el.question_id === id);
 
     return (
-        <>
+        <div className={styles.answersBlock}>
             {
                 possible_answers.map((ans, i) => (
-                    <div key={ans.id} className="p-field-checkbox">
+                    <div key={ans.id} className={`p-field-checkbox ${styles.answersBlock__answer}`}>
                         <Checkbox
                             inputId={`${i}`}
                             name="answer"
@@ -51,7 +52,7 @@ const Multi = () => {
                     </div>
                 ))
             }
-        </>
+        </div>
     )
 }
 

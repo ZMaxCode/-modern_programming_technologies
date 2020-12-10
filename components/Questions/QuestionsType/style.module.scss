@@ -1,0 +1,15 @@
+@import '../../../styles/params.scss';
+
+.answersBlock{
+    padding: 15px 30px;
+    background: $surface-a;
+
+    &__answer:not(:first-child){
+        margin-top: 20px;
+    }
+
+    &__textarea{
+        width: 100%;
+        height: 200px;
+    }
+}
