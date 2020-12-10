@@ -1,17 +1,22 @@
-import { MultiSelect } from 'primereact/multiselect';
+import { ListBox } from 'primereact/listbox';
 import { Checkbox } from 'primereact/checkbox';
+import { Panel } from 'primereact/panel';
 import styles from './style.module.scss';
 
 const SectionsSettings = (props) => {
+
+    console.log(props.selectSections)
+
     return (
         <>
             <div>
                 {
-                    props.sections.map((el, i) => {
-                        return (
+                    props.sections.map((el, i) =>
+                        !(i !== 0 && props.selectSections[i - 1].length === 0) &&
+                        (
                             <div key={i} className="p-field p-md-4 p-pl-0">
                                 <span className="p-float-label">
-                                    <MultiSelect
+                                    <ListBox
                                         id={`${i}`}
                                         value={props.selectSections[i]}
                                         onChange={(e) => {
@@ -22,45 +27,49 @@ const SectionsSettings = (props) => {
                                         className={styles.multi}
                                         filter
                                         disabled={i !== 0 && props.selectSections[i - 1].length === 0}
+                                        multiple
                                     />
-                                    <label htmlFor="0">Course section</label>
                                 </span>
                             </div>
                         )
-                    })
+                    )
                 }
             </div>
+
             <div>
                 {
-                    props.selectSections.map((sections, i) => {
-                        return (
-                            <div key={i}>
-                                <h4>{sections[0]?.level_name}</h4>
+                    props.selectSections.map((sections, i) =>
+                        (sections.length !== 0 && sections.some(el => el.questions)) && (
+                            <Panel header={sections[0]?.level_name} key={i}>
                                 {
                                     sections.map((section, i) => {
                                         if ('questions' in section)
                                             return (
-                                                <div key={i}>
-                                                    <Checkbox
-                                                        inputId={`${i}`}
-                                                        name="answer"
-                                                        value={section}
-                                                        onChange={props.onSectionsChange}
-                                                        checked={props.selectedSections.some(el => el === section)}
-                                                    />
-                                                    <label htmlFor={i} style={{ marginLeft: '1vw' }}>{section.section.name}</label>
+                                                <div
+                                                    key={i}
+                                                    className={styles.section}
+                                                >
+                                                    <div>
+                                                        <Checkbox
+                                                            inputId={`${i}`}
+                                                            name="answer"
+                                                            value={section}
+                                                            onChange={props.onSectionsChange}
+                                                            checked={props.selectedSections.some(el => el === section)}
+                                                            
+                                                        />
+                                                        <label htmlFor={i} style={{ marginLeft: '1vw' }}>{section.section.name}</label>
+                                                    </div>
+                                                    <span>{section.questions.length}</span>
                                                 </div>
                                             )
                                     })
                                 }
-                            </div>
+                            </Panel>
                         )
-                    })
+                    )
                 }
             </div>
-            {
-                props.selectedSections.length !== 0 && <h3>Суммарное количество вопросов в выбранных сукциях: {props.questions.length}</h3>
-            }
         </>
     )
 }

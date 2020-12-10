@@ -9,26 +9,24 @@ import { useState, useEffect } from 'react';
 import styles from './style.module.scss';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
+import View from '../../components/view';
 
 function Course({ course }) {
-    const [isSectionSettings, setIsSectionSettings] = useState(true);
     const [sections, setSections] = useState([[]])
     const [selectSections, setSelectSections] = useState([[]]);
     const [selectedSections, setSelectedSections] = useState([]);
     const [questions, setQuestions] = useState([]);
-    
-    const [isTestSettings, setIsTestSettings] = useState(false);
+
     const [questionsCount, setQuestionsCount] = useState();
     const [timerActive, setTimerActive] = useState(false);
     const [duration, setDuration] = useState(10 * 60 * 1000);
     const [complexity, setComplexity] = useState([]);
     const [selectedComplexity, setSelectedComplexity] = useState([]);
 
-    const [isStartTest, setIsStartTest] = useState(false);
     const [answers, setAnswers] = useState([]);
 
-    const [isFinishTest, setIsFinishTest] = useState(false);
     const [scores, setScores] = useState(0);
+    const [activePanel, setActivePanel] = useState('sections');
     let toast;
 
     useEffect(() => {
@@ -52,6 +50,8 @@ function Course({ course }) {
     function handle(i, event) {
         let copy = [...selectSections];
 
+        console.log(event.value)
+
         copy[i] = event.value;
 
         if (event.value.length === 0) {
@@ -64,6 +64,7 @@ function Course({ course }) {
     }
 
     function onSectionsChange(e) {
+        console.log(e)
         let copy = [...selectedSections];
         let copy2 = [...questions];
 
@@ -80,24 +81,22 @@ function Course({ course }) {
     }
 
     function testSettings() {
-        setIsSectionSettings(false);
 
         let copy = [...complexity];
 
-        questions.map( el => {
-            if( !copy.find( c => c.value === el?.complexity ) ){
-                copy.push( {value : el.complexity} )
+        questions.map(el => {
+            if (!copy.find(c => c.value === el?.complexity)) {
+                copy.push({ value: el.complexity })
             }
-        } )
+        })
 
-        setComplexity( copy );
+        setComplexity(copy);
 
-        setIsTestSettings(true);
+        setActivePanel('settings')
     }
 
     function SectionSettings() {
-        setIsTestSettings(false);
-        setIsSectionSettings(true);
+        setActivePanel('sections')
     }
 
     function onChangeQuestionsCount(e) {
@@ -114,12 +113,12 @@ function Course({ course }) {
         setQuestionsCount(e.value)
     }
 
-    function onChangeComplexity(e){
+    function onChangeComplexity(e) {
         setSelectedComplexity(e.value);
-        
-        let count = e.value.length === 0 ? questions.length : questions.filter( el => e.value.indexOf( el.complexity ) > -1).length
 
-        setQuestionsCount( count );
+        let count = e.value.length === 0 ? questions.length : questions.filter(el => e.value.indexOf(el.complexity) > -1).length
+
+        setQuestionsCount(count);
     }
 
     function startTest() {
@@ -166,7 +165,7 @@ function Course({ course }) {
 
         if (questionsCount === undefined) setQuestionsCount(questions.length);
 
-        let quests = questions.filter( el => selectedComplexity.indexOf( el.complexity ) > -1);
+        let quests = questions.filter(el => selectedComplexity.indexOf(el.complexity) > -1);
 
         if (questionsCount < quests.length) {
             let q = [];
@@ -180,8 +179,7 @@ function Course({ course }) {
 
         setQuestions(quests);
 
-        setIsTestSettings(false);
-        setIsStartTest(true);
+        setActivePanel('testing')
         setTimerActive(true);
     }
 
@@ -198,33 +196,75 @@ function Course({ course }) {
         setScores(copy);
 
         setTimerActive(false);
-        setIsStartTest(false);
-        setIsFinishTest(true);
+        setActivePanel('finish');
     }
 
-    if (isStartTest && !timerActive) {
+    if (activePanel === 'testing' && !timerActive) {
         finishTest();
     }
 
     return (
-        <div className={styles.card}>
-            {
-                isSectionSettings &&
-                <>
-                    <SectionsSettings
-                        sections={sections}
-                        selectSections={selectSections}
-                        selectedSections={selectedSections}
-                        questions={questions}
-                        onSectionsChange={onSectionsChange}
-                        handle={handle}
-                    />
-                    <Button icon='pi pi-angle-right' label='Next step' className='p-mt-3 p-d-block' onClick={testSettings} />
-                </>
-            }
-            {
-                isTestSettings &&
-                <>
+        <div>
+            <h1 className={styles.h1}>Программирование</h1>
+
+            <View activePanel={activePanel}>
+
+                <div id='sections'>
+                    <h2 className={styles.h2}>Шаг 1. Выберите разделы для изучения</h2>
+                    <div className={`p-d-flex p-ai-start`}>
+                        <div className={styles.leftSide}>
+                            <SectionsSettings
+                                sections={sections}
+                                selectSections={selectSections}
+                                selectedSections={selectedSections}
+                                questions={questions}
+                                onSectionsChange={onSectionsChange}
+                                handle={handle}
+                            />
+                        </div>
+
+                        <div className='p-ml-4'>
+                            Суммарное количество вопросов в выбранных секциях: {questions.length}
+                            <Button
+                                icon='pi pi-angle-right'
+                                label='Следующий шаг'
+                                className='p-d-block p-mt-2'
+                                onClick={testSettings}
+                            />
+                        </div>
+
+                    </div>
+                </div>
+
+                {/* <div id='themes'>
+                    <h2 className={styles.h2}>Шаг 2. Выберите темы в каждом разделе</h2>
+                    <div className={`p-d-flex p-ai-start`}>
+                        <div className={styles.leftSide}>
+                            <ThemeSettings
+                                selectSections={selectSections}
+                                selectedSections={selectedSections}
+                                onSectionsChange={onSectionsChange}
+                            />
+                        </div>
+                        <div className='p-ml-4'>
+
+                            <Button
+                                icon='pi pi-angle-right'
+                                label='Следующий шаг'
+                                className='p-d-block p-mt-2'
+                                onClick={() => setSections(setActivePanel('settings'))}
+                            />
+                            <Button
+                                icon='pi pi-angle-left'
+                                label='Назад'
+                                className='p-d-block p-mt-2 p-button-secondary'
+                                onClick={() => setSections(setActivePanel('sections'))}
+                            />
+                        </div>
+                    </div>
+                </div> */}
+
+                <div id='settings'>
                     <TestsSettings
                         complexity={complexity}
                         selectedComplexity={selectedComplexity}
@@ -239,11 +279,9 @@ function Course({ course }) {
                         <Button icon='pi pi-angle-left' label='Cancel' className='p-button-text p-button-secondary' onClick={SectionSettings} />
                         <Button icon='pi pi-angle-right' label='Start test' className='p-mt-3 p-ml-6' onClick={startTest} />
                     </div>
-                </>
-            }
-            {
-                isStartTest &&
-                <>
+                </div>
+
+                <div id='testing'>
                     <Timer
                         duration={duration}
                         timerActive={timerActive}
@@ -257,17 +295,16 @@ function Course({ course }) {
                     <div className='p-mt-3'>
                         <Button icon='pi pi-check' label='Finish test' className='p-mt-3' onClick={finishTest} />
                     </div>
-                </>
-            }
-            {
-                isFinishTest &&
-                <>
+                </div>
+
+                <div id='finish'>
                     <Results
                         scores={scores}
                     />
-                </>
-            }
-            <Toast ref={(el) => toast = el} position='bottom-left' />
+                </div>
+
+                <Toast ref={(el) => toast = el} position='bottom-left' />
+            </View>
         </div>
     )
 }

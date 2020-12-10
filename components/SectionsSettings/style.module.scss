@@ -1,3 +1,14 @@
+@import '../../styles/params.scss';
+
 .multi {
-    width: 30vw;
+    width: $leftSideContainer;
+}
+
+
+.section{
+    background: $surface-c;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
