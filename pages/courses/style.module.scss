@@ -33,3 +33,54 @@
     -webkit-font-feature-settings: "liga";
     -webkit-font-smoothing: antialiased;
 }
+
+.header{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 10px;
+    height: 70px;
+}
+
+.aside{
+    min-width: 255px;
+    max-width: 255px;
+    padding: 0 40px;
+    height: calc(100vh - 70px);
+    overflow: auto;
+
+    &__list{
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    &__item{
+
+        &:not(:first-child){
+            margin-top: 20px;
+        }
+
+        &:not(&_active){
+            color: #00000088;
+        }
+
+        & > span{
+            margin-left: 12px;
+        }
+
+    }
+}
+
+.contentSide{
+    display: flex;
+    justify-content: center;
+    height: calc(100vh - 70px);
+    overflow: auto;
+    width: 100%;
+}
+
+.container{
+    width: $container;
+    padding-bottom: 30px;
+}

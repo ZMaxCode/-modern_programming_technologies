@@ -10,6 +10,8 @@ import styles from './style.module.scss';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import View from '../../components/view';
+import Avatar from '../../components/Avatar';
+import { DropDown } from 'primereact/dropdown';
 
 function Course({ course }) {
     const [sections, setSections] = useState([[]])
@@ -27,6 +29,7 @@ function Course({ course }) {
 
     const [scores, setScores] = useState(0);
     const [activePanel, setActivePanel] = useState('sections');
+    const [courseValue, setCourseValue] = useState(1);
     let toast;
 
     useEffect(() => {
@@ -204,39 +207,65 @@ function Course({ course }) {
     }
 
     return (
-        <div>
-            <h1 className={styles.h1}>Программирование</h1>
-
-            <View activePanel={activePanel}>
-
-                <div id='sections'>
-                    <h2 className={styles.h2}>Шаг 1. Выберите разделы для изучения</h2>
-                    <div className={`p-d-flex p-ai-start`}>
-                        <div className={styles.leftSide}>
-                            <SectionsSettings
-                                sections={sections}
-                                selectSections={selectSections}
-                                selectedSections={selectedSections}
-                                questions={questions}
-                                onSectionsChange={onSectionsChange}
-                                handle={handle}
-                            />
-                        </div>
-
-                        <div className='p-ml-4'>
-                            Суммарное количество вопросов в выбранных секциях: {questions.length}
-                            <Button
-                                icon='pi pi-angle-right'
-                                label='Следующий шаг'
-                                className='p-d-block p-mt-2'
-                                onClick={testSettings}
-                            />
-                        </div>
-
-                    </div>
+        <>
+            <header className={styles.header}>
+                <div className='p-d-flex p-ai-center'>
+                    <Button
+                        icon='pi pi-cog'
+                        className='p-button-text p-button-rounded p-button-secondary'
+                    />
+                    <Button
+                        icon='pi pi-bell'
+                        className='p-button-text p-button-rounded p-button-secondary p-ml-4'
+                    />
+                    <Avatar
+                        className='p-ml-5'
+                        src='/images/avatar.jpg'
+                    />
                 </div>
+            </header>
+            <div className='p-d-flex'>
+                <aside className={styles.aside}>
+                    <ul className={styles.aside__list}>
+                        <li className={styles.aside__item}> <i className='pi pi-list' /> <span>Темы</span> </li>
+                        <li className={`${styles.aside__item} ${styles.aside__item_active}`}> <i className='pi pi-check-square' /> <span>Тесты</span> </li>
+                        <li className={styles.aside__item}> <i className='pi pi-chart-bar' /> <span>Результаты</span> </li>
+                    </ul>
+                </aside>
+                <div className={styles.contentSide}>
+                    <div className={styles.container}>
+                        <h1 className='p-mt-0'>Программирование</h1>
 
-                {/* <div id='themes'>
+                        <View activePanel={activePanel}>
+
+                            <div id='sections'>
+                                <h2 className={styles.h2}>Шаг 1. Выберите разделы для изучения</h2>
+                                <div className={`p-d-flex p-ai-start`}>
+                                    <div className={styles.leftSide}>
+                                        <SectionsSettings
+                                            sections={sections}
+                                            selectSections={selectSections}
+                                            selectedSections={selectedSections}
+                                            questions={questions}
+                                            onSectionsChange={onSectionsChange}
+                                            handle={handle}
+                                        />
+                                    </div>
+
+                                    <div className='p-ml-4'>
+                                        Суммарное количество вопросов в выбранных секциях: {questions.length}
+                                        <Button
+                                            icon='pi pi-angle-right'
+                                            label='Следующий шаг'
+                                            className='p-d-block p-mt-2'
+                                            onClick={testSettings}
+                                        />
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            {/* <div id='themes'>
                     <h2 className={styles.h2}>Шаг 2. Выберите темы в каждом разделе</h2>
                     <div className={`p-d-flex p-ai-start`}>
                         <div className={styles.leftSide}>
@@ -264,48 +293,51 @@ function Course({ course }) {
                     </div>
                 </div> */}
 
-                <div id='settings'>
-                    <TestsSettings
-                        complexity={complexity}
-                        selectedComplexity={selectedComplexity}
-                        onChangeComplexity={onChangeComplexity}
-                        questions={questions}
-                        questionsCount={questionsCount}
-                        onChangeQuestionsCount={onChangeQuestionsCount}
-                        duration={duration}
-                        setDuration={setDuration}
-                    />
-                    <div className='p-mt-3'>
-                        <Button icon='pi pi-angle-left' label='Cancel' className='p-button-text p-button-secondary' onClick={SectionSettings} />
-                        <Button icon='pi pi-angle-right' label='Start test' className='p-mt-3 p-ml-6' onClick={startTest} />
+                            <div id='settings'>
+                                <TestsSettings
+                                    complexity={complexity}
+                                    selectedComplexity={selectedComplexity}
+                                    onChangeComplexity={onChangeComplexity}
+                                    questions={questions}
+                                    questionsCount={questionsCount}
+                                    onChangeQuestionsCount={onChangeQuestionsCount}
+                                    duration={duration}
+                                    setDuration={setDuration}
+                                />
+                                <div className='p-mt-3'>
+                                    <Button icon='pi pi-angle-left' label='Cancel' className='p-button-text p-button-secondary' onClick={SectionSettings} />
+                                    <Button icon='pi pi-angle-right' label='Start test' className='p-mt-3 p-ml-6' onClick={startTest} />
+                                </div>
+                            </div>
+
+                            <div id='testing'>
+                                <Timer
+                                    duration={duration}
+                                    timerActive={timerActive}
+                                    setTimerActive={setTimerActive}
+                                />
+                                <Tests
+                                    questions={questions}
+                                    answers={answers}
+                                    setAnswers={setAnswers}
+                                ></Tests>
+                                <div className='p-mt-3'>
+                                    <Button icon='pi pi-check' label='Finish test' className='p-mt-3' onClick={finishTest} />
+                                </div>
+                            </div>
+
+                            <div id='finish'>
+                                <Results
+                                    scores={scores}
+                                />
+                            </div>
+
+                            <Toast ref={(el) => toast = el} position='bottom-left' />
+                        </View>
                     </div>
                 </div>
-
-                <div id='testing'>
-                    <Timer
-                        duration={duration}
-                        timerActive={timerActive}
-                        setTimerActive={setTimerActive}
-                    />
-                    <Tests
-                        questions={questions}
-                        answers={answers}
-                        setAnswers={setAnswers}
-                    ></Tests>
-                    <div className='p-mt-3'>
-                        <Button icon='pi pi-check' label='Finish test' className='p-mt-3' onClick={finishTest} />
-                    </div>
-                </div>
-
-                <div id='finish'>
-                    <Results
-                        scores={scores}
-                    />
-                </div>
-
-                <Toast ref={(el) => toast = el} position='bottom-left' />
-            </View>
-        </div>
+            </div>
+        </>
     )
 }
 
