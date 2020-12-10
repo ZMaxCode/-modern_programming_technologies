@@ -5,7 +5,7 @@ import styles from './style.module.scss';
 
 const SectionsSettings = (props) => {
 
-    console.log(props.selectSections)
+    console.log(props.sections)
 
     return (
         <>
@@ -36,7 +36,7 @@ const SectionsSettings = (props) => {
                 }
             </div>
 
-            <div>
+            {/* <div>
                 {
                     props.selectSections.map((sections, i) =>
                         (sections.length !== 0 && sections.some(el => el.questions)) && (
@@ -69,7 +69,7 @@ const SectionsSettings = (props) => {
                         )
                     )
                 }
-            </div>
+            </div> */}
         </>
     )
 }

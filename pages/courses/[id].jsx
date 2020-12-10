@@ -12,6 +12,7 @@ import { Toast } from 'primereact/toast';
 import View from '../../components/view';
 import Avatar from '../../components/Avatar';
 import { DropDown } from 'primereact/dropdown';
+import ThemeSettings from '../../components/ThemeSettings';
 
 function Course({ course }) {
     const [sections, setSections] = useState([[]])
@@ -95,7 +96,7 @@ function Course({ course }) {
 
         setComplexity(copy);
 
-        setActivePanel('settings')
+        setActivePanel('themes')
     }
 
     function SectionSettings() {
@@ -265,33 +266,33 @@ function Course({ course }) {
                                 </div>
                             </div>
 
-                            {/* <div id='themes'>
-                    <h2 className={styles.h2}>Шаг 2. Выберите темы в каждом разделе</h2>
-                    <div className={`p-d-flex p-ai-start`}>
-                        <div className={styles.leftSide}>
-                            <ThemeSettings
-                                selectSections={selectSections}
-                                selectedSections={selectedSections}
-                                onSectionsChange={onSectionsChange}
-                            />
-                        </div>
-                        <div className='p-ml-4'>
+                            <div id='themes'>
+                                <h2 className={styles.h2}>Шаг 2. Выберите темы в каждом разделе</h2>
+                                <div className={`p-d-flex p-ai-start`}>
+                                    <div className={styles.leftSide}>
+                                        <ThemeSettings
+                                            selectSections={selectSections}
+                                            selectedSections={selectedSections}
+                                            onSectionsChange={onSectionsChange}
+                                        />
+                                    </div>
+                                    <div className='p-ml-4'>
 
-                            <Button
-                                icon='pi pi-angle-right'
-                                label='Следующий шаг'
-                                className='p-d-block p-mt-2'
-                                onClick={() => setSections(setActivePanel('settings'))}
-                            />
-                            <Button
-                                icon='pi pi-angle-left'
-                                label='Назад'
-                                className='p-d-block p-mt-2 p-button-secondary'
-                                onClick={() => setSections(setActivePanel('sections'))}
-                            />
-                        </div>
-                    </div>
-                </div> */}
+                                        <Button
+                                            icon='pi pi-angle-right'
+                                            label='Следующий шаг'
+                                            className='p-d-block p-mt-2'
+                                            onClick={() => setActivePanel('settings')}
+                                        />
+                                        <Button
+                                            icon='pi pi-angle-left'
+                                            label='Назад'
+                                            className='p-d-block p-mt-2 p-button-secondary'
+                                            onClick={() => setActivePanel('sections')}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
 
                             <div id='settings'>
                                 <TestsSettings
