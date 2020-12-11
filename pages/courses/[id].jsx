@@ -170,20 +170,26 @@ function Course({ course }) {
 
         if (error) return;
 
-        if (questionsCount === undefined) setQuestionsCount(questions.length);
+        let copy = questionsCount;
+        let quests = questions;
+        console.log(copy, questions)
 
-        let quests = questions.filter(el => selectedComplexity.indexOf(el.complexity) > -1);
+        if (questionsCount === undefined)
+            copy = questions.length;
+        else
+            quests = questions.filter(el => selectedComplexity.indexOf(el.complexity) > -1);
 
-        if (questionsCount < quests.length) {
+        if (copy < quests.length) {
             let q = [];
 
-            for (let i = 0; i < questionsCount; i++) {
+            for (let i = 0; i < copy; i++) {
                 q.push(quests.splice(Math.floor(Math.random() * quests.length - 1), 1)[0]);
             }
 
             quests = q;
         }
 
+        setQuestionsCount(copy);
         setQuestions(quests);
 
         setActivePanel('testing')
@@ -247,7 +253,7 @@ function Course({ course }) {
                 <div className={styles.contentSide}>
                     <div className={`${styles.container} p-pl-1`}>
                         {
-                            activePanel !== 'testing' && 
+                            activePanel !== 'testing' &&
                             <h1 className='p-mt-0'>Программирование</h1>
                         }
 
@@ -347,10 +353,10 @@ function Course({ course }) {
                                     setAnswers={setAnswers}
                                 ></Tests>
                                 <div className='p-mt-3'>
-                                    <Button 
-                                        icon='pi pi-check' 
-                                        label='Finish test' 
-                                        className='p-mt-3 p-mb-6' onClick={finishTest} 
+                                    <Button
+                                        icon='pi pi-check'
+                                        label='Finish test'
+                                        className='p-mt-3 p-mb-6' onClick={finishTest}
                                     />
                                 </div>
                             </div>
@@ -361,11 +367,11 @@ function Course({ course }) {
                                 />
                             </div>
 
-                            <Toast ref={(el) => toast = el} position='bottom-left' />
                         </View>
                     </div>
                 </div>
             </div>
+            <Toast ref={(el) => toast = el} position='bottom-right' />
         </>
     )
 }
